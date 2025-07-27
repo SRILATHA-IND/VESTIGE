@@ -32,12 +32,6 @@
       background-color: white;
       padding: 10px 20px;
       border-radius: 0 0 20px 20px;
-      animation: fadeDown 1s ease-in-out;
-    }
-
-    @keyframes fadeDown {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
     }
 
     .logo {
@@ -104,6 +98,15 @@
       color: white;
     }
 
+    .section-title {
+      width: 100%;
+      font-size: 18px;
+      font-weight: bold;
+      margin: 20px 0 10px;
+      color: white;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    }
+
     .cards {
       display: flex;
       flex-wrap: wrap;
@@ -111,12 +114,6 @@
       gap: 10px;
       justify-content: flex-start;
       align-items: flex-start;
-      animation: fadeInCards 1s ease-in-out;
-    }
-
-    @keyframes fadeInCards {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
     }
 
     .card {
@@ -168,22 +165,76 @@
 
   <script>
     const tabsData = {
-      en: ["HOME", "MEDICINES", "GROCERY", "AGRICULTURE"],
+      en: ["HOME", "SUPPLEMENTS", "GROCERY", "AGRICULTURE"],
       te: ["హోమ్", "ఔషధాలు", "కిరాణా", "వ్యవసాయం"]
     };
 
     const itemsData = {
-      HOME: ["Shampoo", "Toothpaste", "Soap"],
-      MEDICINES: ["Paracetamol", "Ibuprofen", "Antacid"],
-      GROCERY: ["Rice", "Wheat", "Oil"],
-      AGRICULTURE: ["Fertilizer", "Seeds", "Pesticide"]
+      HOME: [
+        { name: "Shampoo", img: "images/shampoo.png" },
+        { name: "Toothpaste", img: "images/toothpaste.png" },
+        { name: "Soap", img: "images/soap.png" }
+      ],
+      SUPPLEMENTS: [
+        { name: "Paracetamol", img: "images/paracetamol.png" },
+        { name: "Ibuprofen", img: "images/ibuprofen.png" },
+        { name: "Antacid", img: "images/antacid.png" }
+      ],
+      GROCERY: {
+        "Toothpaste": [
+          { name: "Colgate", img: "images/colgate.png" },
+          { name: "Pepsodent", img: "images/pepsodent.png" }
+        ],
+        "Soaps": [
+          { name: "ASSURE SOAP", img: "images/lux.png" },
+          { name: "COMPLEXION BAR", img: "images/dove.png" },
+          { name: "CREAMY CLEANSING BAR", img: "images/lifebuoy.png" },
+          { name: "GERM PROTECTION SOAP", img: "images/cinthol.png" }
+        ],
+        "Grains": [
+          { name: "Rice", img: "images/rice.png" },
+          { name: "Wheat", img: "images/wheat.png" }
+        ]
+      },
+      AGRICULTURE: [
+        { name: "Fertilizer", img: "images/fertilizer.png" },
+        { name: "Seeds", img: "images/seeds.png" },
+        { name: "Pesticide", img: "images/pesticide.png" }
+      ]
     };
 
     const itemsTelugu = {
-      HOME: ["షాంపూ", "టూత్‌పేస్ట్", "సబ్బు"],
-      MEDICINES: ["ప్యారాసెటమాల్", "ఇబుప్రోఫెన్", "యాంటాసిడ్"],
-      GROCERY: ["బియ్యం", "గోధుమ", "నూనె"],
-      AGRICULTURE: ["ఎరువు", "విత్తనాలు", "పీస్టిసైడ్"]
+      HOME: [
+        { name: "షాంపూ", img: "images/shampoo.png" },
+        { name: "టూత్‌పేస్ట్", img: "images/toothpaste.png" },
+        { name: "సబ్బు", img: "images/soap.png" }
+      ],
+      SUPPLEMENTS: [
+        { name: "ప్యారాసెటమాల్", img: "images/paracetamol.png" },
+        { name: "ఇబుప్రోఫెన్", img: "images/ibuprofen.png" },
+        { name: "యాంటాసిడ్", img: "images/antacid.png" }
+      ],
+      GROCERY: {
+        "టూత్‌పేస్ట్": [
+          { name: "కాల్గేట్", img: "images/colgate.png" },
+          { name: "పెప్సోడెంట్", img: "images/pepsodent.png" }
+        ],
+        "సబ్బులు": [
+          { name: "అష్యూర్ సబ్బు", img: "images/lux.png" },
+          { name: "కాంప్లెక్షన్ బార్", img: "images/dove.png" },
+          { name: "క్రీమి క్లెన్సింగ్ బార్", img: "images/lifebuoy.png" },
+          { name: "జెర్మ్ ప్రొటెక్షన్ సబ్బు", img: "images/cinthol.png" }
+        ],
+        "ధాన్యాలు": [
+          { name: "బియ్యం", img: "images/rice.png" },
+          { name: "గోధుమ", img: "images/wheat.png" }
+        ]
+      },
+      AGRICULTURE: [
+        { name: "ఎరువు", img: "images/fertilizer.png" },
+        { name: "విత్తనాలు", img: "images/seeds.png" },
+        { name: "పీస్టిసైడ్", img: "images/pesticide.png" }
+      ]
     };
 
     let currentLang = "te";
@@ -211,12 +262,30 @@
       const container = document.getElementById("cards");
       container.innerHTML = "";
       const data = currentLang === "te" ? itemsTelugu : itemsData;
-      data[currentTab].forEach(name => {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `<img src="index.png" alt="${name}" /><p>${name}</p>`;
-        container.appendChild(card);
-      });
+
+      if (currentTab === "GROCERY") {
+        const sections = data.GROCERY;
+        for (let section in sections) {
+          const sectionTitle = document.createElement("div");
+          sectionTitle.className = "section-title";
+          sectionTitle.textContent = section;
+          container.appendChild(sectionTitle);
+
+          sections[section].forEach(item => {
+            const card = document.createElement("div");
+            card.className = "card";
+            card.innerHTML = `<img src="${item.img}" alt="${item.name}" /><p>${item.name}</p>`;
+            container.appendChild(card);
+          });
+        }
+      } else {
+        data[currentTab].forEach(item => {
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `<img src="${item.img}" alt="${item.name}" /><p>${item.name}</p>`;
+          container.appendChild(card);
+        });
+      }
     }
 
     function setLang(lang) {
