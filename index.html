@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VESTIGE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Anek+Telugu&family=Titillium+Web&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #007bff;
+      --green: #28a745;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Anek Telugu', sans-serif;
+      background: linear-gradient(135deg, #00c6ff, #28a745);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: white;
+      padding: 10px 20px;
+      border-radius: 0 0 20px 20px;
+      animation: fadeDown 1s ease-in-out;
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .logo {
+      font-weight: bold;
+      color: var(--green);
+      font-size: 24px;
+      cursor: pointer;
+      font-family: Arial, sans-serif;
+    }
+
+    nav {
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+    }
+
+    nav a {
+      margin: 0 10px;
+      text-decoration: none;
+      color: black;
+      font-family: 'Titillium Web', sans-serif;
+      font-size: 16px;
+      position: relative;
+      transition: color 0.3s;
+    }
+
+    nav a:hover,
+    nav a.active {
+      color: var(--blue);
+    }
+
+    nav a.active::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--blue);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+    }
+
+    .search {
+      padding: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      margin-right: 10px;
+    }
+
+    .language-toggle button {
+      padding: 5px 10px;
+      border: none;
+      cursor: pointer;
+      font-family: 'Titillium Web', sans-serif;
+      border-radius: 5px;
+    }
+
+    .language-toggle button.active {
+      background-color: var(--blue);
+      color: white;
+    }
+
+    .cards {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 20px;
+      gap: 10px;
+      justify-content: flex-start;
+      align-items: flex-start;
+      animation: fadeInCards 1s ease-in-out;
+    }
+
+    @keyframes fadeInCards {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      width: 125px;
+      height: 140px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      text-align: center;
+      padding: 10px;
+      transition: transform 0.3s ease;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .card img {
+      height: 80px;
+      object-fit: contain;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+    }
+
+    .card p {
+      margin: 0;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo" onclick="location.reload()">VESTIGE</div>
+    <nav id="tabs"></nav>
+    <div class="header-right">
+      <input class="search" type="text" id="search" placeholder="Search...">
+      <div class="language-toggle">
+        <button id="btn-te" class="active" onclick="setLang('te')">TE</button>
+        <button id="btn-en" onclick="setLang('en')">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="cards" id="cards"></div>
+  </main>
+
+  <script>
+    const tabsData = {
+      en: ["HOME", "MEDICINES", "GROCERY", "AGRICULTURE"],
+      te: ["హోమ్", "ఔషధాలు", "కిరాణా", "వ్యవసాయం"]
+    };
+
+    const itemsData = {
+      HOME: ["Shampoo", "Toothpaste", "Soap"],
+      MEDICINES: ["Paracetamol", "Ibuprofen", "Antacid"],
+      GROCERY: ["Rice", "Wheat", "Oil"],
+      AGRICULTURE: ["Fertilizer", "Seeds", "Pesticide"]
+    };
+
+    const itemsTelugu = {
+      HOME: ["షాంపూ", "టూత్‌పేస్ట్", "సబ్బు"],
+      MEDICINES: ["ప్యారాసెటమాల్", "ఇబుప్రోఫెన్", "యాంటాసిడ్"],
+      GROCERY: ["బియ్యం", "గోధుమ", "నూనె"],
+      AGRICULTURE: ["ఎరువు", "విత్తనాలు", "పీస్టిసైడ్"]
+    };
+
+    let currentLang = "te";
+    let currentTab = "HOME";
+
+    function renderTabs() {
+      const nav = document.getElementById("tabs");
+      nav.innerHTML = "";
+      tabsData[currentLang].forEach((tab, idx) => {
+        const key = Object.keys(itemsData)[idx];
+        const a = document.createElement("a");
+        a.textContent = tab;
+        a.href = "#";
+        a.className = key === currentTab ? "active" : "";
+        a.onclick = () => {
+          currentTab = key;
+          renderTabs();
+          renderCards();
+        };
+        nav.appendChild(a);
+      });
+    }
+
+    function renderCards() {
+      const container = document.getElementById("cards");
+      container.innerHTML = "";
+      const data = currentLang === "te" ? itemsTelugu : itemsData;
+      data[currentTab].forEach(name => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `<img src="index.png" alt="${name}" /><p>${name}</p>`;
+        container.appendChild(card);
+      });
+    }
+
+    function setLang(lang) {
+      currentLang = lang;
+      document.getElementById("btn-te").classList.toggle("active", lang === "te");
+      document.getElementById("btn-en").classList.toggle("active", lang === "en");
+      renderTabs();
+      renderCards();
+    }
+
+    document.getElementById("search").addEventListener("input", function() {
+      const keyword = this.value.toLowerCase();
+      const allCards = document.querySelectorAll(".card");
+      allCards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        card.style.display = text.includes(keyword) ? "flex" : "none";
+      });
+    });
+
+    window.onload = () => {
+      setLang(currentLang);
+    };
+  </script>
+</body>
+</html>
