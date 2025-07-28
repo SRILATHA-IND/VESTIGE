@@ -14,7 +14,7 @@
     body {
       margin: 0;
       font-family: 'Anek Telugu', sans-serif;
-      background: linear-gradient(135deg, #00c6ff, #28a745);
+      background: linear-gradient(-45deg, #00c6ff, #28a745, #00c6ff, #28a745);
       background-size: 400% 400%;
       animation: gradientBG 15s ease infinite;
     }
@@ -26,12 +26,22 @@
     }
 
     header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
       display: flex;
       align-items: center;
       justify-content: space-between;
       background-color: white;
       padding: 10px 20px;
       border-radius: 0 0 20px 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      animation: slideDown 0.5s ease;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .logo {
@@ -46,16 +56,16 @@
       flex-grow: 1;
       display: flex;
       justify-content: center;
+      gap: 15px;
     }
 
     nav a {
-      margin: 0 10px;
       text-decoration: none;
       color: black;
       font-family: 'Titillium Web', sans-serif;
       font-size: 16px;
       position: relative;
-      transition: color 0.3s;
+      transition: all 0.3s;
     }
 
     nav a:hover,
@@ -105,6 +115,7 @@
       margin: 20px 0 10px;
       color: white;
       text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+      padding-left: 30px;
     }
 
     .cards {
@@ -114,6 +125,7 @@
       gap: 10px;
       justify-content: flex-start;
       align-items: flex-start;
+      animation: fadeIn 0.5s ease;
     }
 
     .card {
@@ -129,6 +141,7 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      animation: slideIn 0.3s ease;
     }
 
     .card img {
@@ -143,7 +156,59 @@
     .card p {
       margin: 0;
       font-weight: bold;
+      text-transform: uppercase;
     }
+
+    .preview-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .preview {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      display: flex;
+      max-width: 700px;
+      width: 90%;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .preview img {
+      width: 150px;
+      margin-right: 30px;
+      border-radius: 10px;
+    }
+
+    .preview .info {
+      font-size: 16px;
+      line-height: 1.6;
+      max-width: 500px;
+    }
+
+    .preview h2 {
+      margin-top: 0;
+      text-transform: uppercase;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
   </style>
 </head>
 <body>
@@ -160,13 +225,55 @@
   </header>
 
   <main>
-    <div class="cards" id="cards"></div>
+    <div id="cards"></div>
   </main>
+
+  <div id="preview-container"></div>
 
   <script>
     const tabsData = {
       en: ["HOME", "SUPPLEMENTS", "GROCERY", "AGRICULTURE"],
       te: ["హోమ్", "ఔషధాలు", "కిరాణా", "వ్యవసాయం"]
+    };
+
+    const descriptions = {
+      "Shampoo": { en: "Cleanses and nourishes hair.", te: "జుట్టును శుభ్రపరిచి పోషిస్తుంది." },
+      "Toothpaste": { en: "Maintains oral hygiene.", te: "పళ్ల ఆరోగ్యం కోసం." },
+      "Soap": { en: "Cleanses and refreshes skin.", te: "చర్మాన్ని శుభ్రపరుస్తుంది." },
+      "Paracetamol": { en: "Reduces fever and pain.", te: "జ్వరం మరియు నొప్పిని తగ్గిస్తుంది." },
+      "Ibuprofen": { en: "Pain reliever and anti-inflammatory.", te: "నొప్పిని తగ్గిస్తుంది." },
+      "Antacid": { en: "Neutralizes stomach acid.", te: "ఆమ్లాన్ని తగ్గిస్తుంది." },
+      "Colgate": { en: "Protects teeth and gums.", te: "పళ్ల మరియు దంతాల సంరక్షణ." },
+      "Pepsodent": { en: "Fights cavities and keeps mouth fresh.", te: "కావిటీల నుండి రక్షణ." },
+      "ASSURE SOAP": { en: "Moisturizes skin effectively.", te: "తేమను అందించే సబ్బు." },
+      "COMPLEXION BAR": { en: "Improves skin tone.", te: "చర్మ ఛాయను మెరుగుపరుస్తుంది." },
+      "CREAMY CLEANSING BAR": { en: "For gentle cleansing.", te: "నర్మదైన శుభ్రత కోసం." },
+      "GERM PROTECTION SOAP": { en: "Kills 99.9% germs.", te: "జీవాణులను నాశనం చేస్తుంది." },
+      "Rice": { en: "Daily staple grain.", te: "ప్రతిరోజూ వాడే ధాన్యం." },
+      "Wheat": { en: "Used for flour & chapatis.", te: "పిండికి మరియు చపాతీలకు." },
+      "Fertilizer": { en: "Improves soil fertility.", te: "భూమి ఫలవంతతను పెంచుతుంది." },
+      "Seeds": { en: "Used for cultivation.", te: "విత్తనాలు నాటడం కోసం." },
+      "Pesticide": { en: "Protects crops from pests.", te: "పంటలను కీటకాలు నుండి రక్షిస్తుంది." }
+    };
+
+    const translations = {
+      "Shampoo": "షాంపూ",
+      "Toothpaste": "టూత్‌పేస్ట్",
+      "Soap": "సబ్బు",
+      "Paracetamol": "ప్యారాసిటమాల్",
+      "Ibuprofen": "ఐబుప్రొఫెన్",
+      "Antacid": "యాంటాసిడ్",
+      "Colgate": "కోల్గేట్",
+      "Pepsodent": "పెప్సోడెంట్",
+      "ASSURE SOAP": "అష్యూర్ సబ్బు",
+      "COMPLEXION BAR": "కాంప్లెక్షన్ బార్",
+      "CREAMY CLEANSING BAR": "క్రీమీ క్లెన్సింగ్ బార్",
+      "GERM PROTECTION SOAP": "జర్మ్ ప్రొటెక్షన్ సబ్బు",
+      "Rice": "బియ్యం",
+      "Wheat": "గోధుమలు",
+      "Fertilizer": "ఎరువు",
+      "Seeds": "విత్తనాలు",
+      "Pesticide": "కీటకనాశినాలు"
     };
 
     const itemsData = {
@@ -203,90 +310,8 @@
       ]
     };
 
-    const itemsTelugu = {
-      HOME: [
-        { name: "షాంపూ", img: "images/shampoo.png" },
-        { name: "టూత్‌పేస్ట్", img: "images/toothpaste.png" },
-        { name: "సబ్బు", img: "images/soap.png" }
-      ],
-      SUPPLEMENTS: [
-        { name: "ప్యారాసెటమాల్", img: "images/paracetamol.png" },
-        { name: "ఇబుప్రోఫెన్", img: "images/ibuprofen.png" },
-        { name: "యాంటాసిడ్", img: "images/antacid.png" }
-      ],
-      GROCERY: {
-        "టూత్‌పేస్ట్": [
-          { name: "కాల్గేట్", img: "images/colgate.png" },
-          { name: "పెప్సోడెంట్", img: "images/pepsodent.png" }
-        ],
-        "సబ్బులు": [
-          { name: "అష్యూర్ సబ్బు", img: "images/lux.png" },
-          { name: "కాంప్లెక్షన్ బార్", img: "images/dove.png" },
-          { name: "క్రీమి క్లెన్సింగ్ బార్", img: "images/lifebuoy.png" },
-          { name: "జెర్మ్ ప్రొటెక్షన్ సబ్బు", img: "images/cinthol.png" }
-        ],
-        "ధాన్యాలు": [
-          { name: "బియ్యం", img: "images/rice.png" },
-          { name: "గోధుమ", img: "images/wheat.png" }
-        ]
-      },
-      AGRICULTURE: [
-        { name: "ఎరువు", img: "images/fertilizer.png" },
-        { name: "విత్తనాలు", img: "images/seeds.png" },
-        { name: "పీస్టిసైడ్", img: "images/pesticide.png" }
-      ]
-    };
-
     let currentLang = "te";
     let currentTab = "HOME";
-
-    function renderTabs() {
-      const nav = document.getElementById("tabs");
-      nav.innerHTML = "";
-      tabsData[currentLang].forEach((tab, idx) => {
-        const key = Object.keys(itemsData)[idx];
-        const a = document.createElement("a");
-        a.textContent = tab;
-        a.href = "#";
-        a.className = key === currentTab ? "active" : "";
-        a.onclick = () => {
-          currentTab = key;
-          renderTabs();
-          renderCards();
-        };
-        nav.appendChild(a);
-      });
-    }
-
-    function renderCards() {
-      const container = document.getElementById("cards");
-      container.innerHTML = "";
-      const data = currentLang === "te" ? itemsTelugu : itemsData;
-
-      if (currentTab === "GROCERY") {
-        const sections = data.GROCERY;
-        for (let section in sections) {
-          const sectionTitle = document.createElement("div");
-          sectionTitle.className = "section-title";
-          sectionTitle.textContent = section;
-          container.appendChild(sectionTitle);
-
-          sections[section].forEach(item => {
-            const card = document.createElement("div");
-            card.className = "card";
-            card.innerHTML = `<img src="${item.img}" alt="${item.name}" /><p>${item.name}</p>`;
-            container.appendChild(card);
-          });
-        }
-      } else {
-        data[currentTab].forEach(item => {
-          const card = document.createElement("div");
-          card.className = "card";
-          card.innerHTML = `<img src="${item.img}" alt="${item.name}" /><p>${item.name}</p>`;
-          container.appendChild(card);
-        });
-      }
-    }
 
     function setLang(lang) {
       currentLang = lang;
@@ -296,17 +321,121 @@
       renderCards();
     }
 
-    document.getElementById("search").addEventListener("input", function() {
-      const keyword = this.value.toLowerCase();
-      const allCards = document.querySelectorAll(".card");
-      allCards.forEach(card => {
-        const text = card.textContent.toLowerCase();
-        card.style.display = text.includes(keyword) ? "flex" : "none";
+    function renderTabs() {
+      const nav = document.getElementById("tabs");
+      nav.innerHTML = "";
+      tabsData[currentLang].forEach((tabName, idx) => {
+        const key = Object.keys(itemsData)[idx];
+        const tab = document.createElement("a");
+        tab.textContent = tabName;
+        tab.className = key === currentTab ? "active" : "";
+        tab.href = "#";
+        tab.onclick = () => {
+          currentTab = key;
+          renderTabs();
+          renderCards();
+        };
+        nav.appendChild(tab);
+      });
+    }
+
+    function renderCards() {
+      const container = document.getElementById("cards");
+      container.innerHTML = "";
+
+      const langKey = currentLang;
+
+      if (currentTab === "GROCERY") {
+        const categories = itemsData.GROCERY;
+        for (const [section, items] of Object.entries(categories)) {
+          const title = document.createElement("div");
+          title.className = "section-title";
+          title.textContent = currentLang === "te" ? translations[section] || section : section.toUpperCase();
+          container.appendChild(title);
+
+          const wrapper = document.createElement("div");
+          wrapper.className = "cards";
+          items.forEach(item => {
+            const card = document.createElement("div");
+            card.className = "card";
+            card.innerHTML = `
+              <img src="${item.img}" alt="${item.name}" />
+              <p>${(currentLang === "te" ? translations[item.name] : item.name).toUpperCase()}</p>
+            `;
+            card.onclick = () => showPreview(item);
+            wrapper.appendChild(card);
+          });
+          container.appendChild(wrapper);
+        }
+      } else {
+        const wrapper = document.createElement("div");
+        wrapper.className = "cards";
+        itemsData[currentTab].forEach(item => {
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+            <img src="${item.img}" alt="${item.name}" />
+            <p>${(currentLang === "te" ? translations[item.name] : item.name).toUpperCase()}</p>
+          `;
+          card.onclick = () => showPreview(item);
+          wrapper.appendChild(card);
+        });
+        container.appendChild(wrapper);
+      }
+    }
+
+    function showPreview(item) {
+      const previewContainer = document.getElementById("preview-container");
+      const desc = descriptions[item.name] || { en: "", te: "" };
+      previewContainer.innerHTML = `
+        <div class="preview-overlay" onclick="this.remove()">
+          <div class="preview" onclick="event.stopPropagation()">
+            <img src="${item.img}" alt="${item.name}" />
+            <div class="info">
+              <h2>${(currentLang === "te" ? translations[item.name] : item.name).toUpperCase()}</h2>
+              <p><strong>${currentLang === "te" ? "వివరణ" : "Description"}:</strong> ${desc[currentLang]}</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    document.getElementById("search").addEventListener("input", function () {
+      const query = this.value.toLowerCase();
+      const allItems = [];
+
+      Object.entries(itemsData).forEach(([tab, section]) => {
+        if (tab === "GROCERY") {
+          Object.values(section).forEach(sub => allItems.push(...sub));
+        } else {
+          allItems.push(...section);
+        }
+      });
+
+      const filtered = allItems.filter(item => {
+        const name = currentLang === "te" ? translations[item.name] || item.name : item.name;
+        return name.toLowerCase().includes(query);
+      });
+
+      const container = document.getElementById("cards");
+      container.innerHTML = `<div class="cards"></div>`;
+      const wrapper = container.querySelector(".cards");
+
+      filtered.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <img src="${item.img}" alt="${item.name}" />
+          <p>${(currentLang === "te" ? translations[item.name] : item.name).toUpperCase()}</p>
+        `;
+        card.onclick = () => showPreview(item);
+        wrapper.appendChild(card);
       });
     });
 
     window.onload = () => {
-      setLang(currentLang);
+      renderTabs();
+      renderCards();
     };
   </script>
 </body>
